@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const fullpath = __dirname;
+const fullPath = __dirname;
 const readline = require('readline');
 
 const rl = readline.createInterface({
@@ -9,41 +9,41 @@ const rl = readline.createInterface({
 });
 
 function goodBy() {
-  console.log('\n' + 'Goood By!');
+  console.log('\n' + 'Good-by!');
   rl.close(); 
 }
 
 function writeToFile (inputText) {
     rl.prompt();
-    fs.appendFile(path.join(fullpath, 'text.txt'), inputText.trim() + '\n', (error) => {
+    fs.appendFile(path.join(fullPath, 'text.txt'), inputText.trim() + '\n', (error) => {
       if(error) throw error; 
     });
 }
 
-fs.open(path.join(fullpath, 'text.txt'), 'w', (error) => {
+fs.open(path.join(fullPath, 'text.txt'), 'w', (error) => {
   if(error) throw error;
 });
   
 console.log ('Enter the text:');
 
-rl.input.on("keypress", function(chunk, key) {
+rl.input.on('keypress', function(chunk, key) {
   if(key && key.name === "c" && key.ctrl) {
     goodBy();
   }
 });
 
-rl.setPrompt(`> `);
+rl.setPrompt('> ');
 
-rl.question(`> `,
+rl.question('> ',
 (userInput) => {
-  if(userInput.trim() === "exit"){
+  if(userInput.trim() === 'exit'){
     goodBy();
   } else {
     writeToFile (userInput);
   }
 
   rl.on('line', (userInput) => {
-    if(userInput.trim() === "exit"){
+    if(userInput.trim() === 'exit'){
       goodBy();
     } else {
       writeToFile (userInput);
