@@ -3,13 +3,15 @@ const path = require('path');
 const pathSrc = path.join(__dirname, 'files');
 const pathDst = path.join(__dirname, 'files-copy');
 
-if (fs.existsSync(pathDst)) {
-    console.log('Destination folder already exists!')
-} else {
-    fs.mkdir(pathDst, (err) => {
-        if (err) console.log(err);
-    });    
-}
+fs.exists(pathDst, (exists) => {
+    if (exists) {
+        console.log('Destination folder already exists!')
+    } else {
+        fs.mkdir(pathDst, (err) => {
+            if (err) console.log(err);
+        });    
+    }
+});
 
 fs.readdir(pathSrc, { withFileTypes: true }, (err, files) => {
     if (err) {
@@ -25,3 +27,4 @@ fs.readdir(pathSrc, { withFileTypes: true }, (err, files) => {
         });    
     }
 })
+    
