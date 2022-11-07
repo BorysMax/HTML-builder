@@ -2,63 +2,29 @@ const fs = require('fs');
 const path = require('path');
 const pathSrc = path.join(__dirname, 'styles');
 const pathHtml = path.join(__dirname, 'components');
+const pathTempHtml = path.join(__dirname, 'template.html');
 const pathDst = path.join(__dirname, 'project-dist');
-const pathAssets = path.join(__dirname, 'project-dist', 'assets');
-const fileBundleCss = path.join(__dirname, 'project-dist', 'style.css');
-const fileBundleHtml = path.join(__dirname, 'project-dist', 'index.html');
+const pathAssets = path.join(__dirname, 'assets');
+const pathBundAssets = path.join(pathDst, 'assets');
+const fileBundCss = path.join(pathDst, 'style.css');
+const fileBundHtml = path.join(pathDst, 'index.html');
+
+let resArray = [];
 
 makeDir(pathDst);
-makeDir(pathAssets);
-copyFilesFromDir (path.join(__dirname, 'assets'), path.join(pathDst, 'assets'));
+makeDir(pathBundAssets);
+copyFilesFromDir (pathAssets, pathBundAssets);
 
-fs.open(fileBundleCss, 'w', (err) => {
+fs.open(fileBundCss, 'w', (err) => {
   if(err) console.log(err);
 });
 
-fs.readdir(pathSrc, { withFileTypes: true }, (err, files) => {
-  if (err) {
-      console.log(err);
-  } else {
-    files.forEach(file => {
-      if (path.extname(file.name) === '.css') {
-        let fileSrc = path.join(pathSrc, file.name);
-        console.log(file.name + '\t' + 'append to bundle.css');
-        fs.readFile(fileSrc, "utf8", (err, data) => {
-          if(err) {s
-            console.log(err); 
-          } else {
-            fs.appendFile(fileBundleCss, data, (err) => {
-              if(err) console.log(err); 
-            });    
-          }  
-        });
-      }  
-    });    
-  }
-})
-
-let filename = path.join(__dirname, 'template.html');
-let array = [];
-let resArray = [];
-
-function addArray (data, spaceNum) {
-  let array = data.toString().split("\n").map(item => item = " ".repeat(spaceNum) + item); 
-  return array;
-}
-
-function writeToFile (inputArr) {
-  let content = inputArr.join("\n");
-  fs.writeFile(path.join(pathDst, "index.html"), content, (err) => {
-    if(err) console.log(err); 
-  });    
-}
-
-const main = async () => {
-  let dataTemp = await fs.promises.readFile(filename, 'utf8');
+const createIndexHtml = async () => {
+  let dataTemp = await fs.promises.readFile(pathTempHtml, 'utf8');
   let dataHeader = await fs.promises.readFile(path.join(pathHtml, 'header.html'), 'utf8');
   let dataFooter = await fs.promises.readFile(path.join(pathHtml, 'footer.html'), 'utf8');
   let dataArt = await fs.promises.readFile(path.join(pathHtml, 'articles.html'), 'utf8');
-  array = addArray (dataTemp, 0);
+  let array = addArray (dataTemp, 0);
   for(i in array) {
     resArray.push(array[i]);
     if (array[i].trim() === '{{header}}') {
@@ -78,7 +44,29 @@ const main = async () => {
   writeToFile (resArray);
 };
   
-main().catch(console.error);
+createIndexHtml().catch(console.error);
+
+fs.readdir(pathSrc, { withFileTypes: true }, (err, files) => {
+  if (err) {
+      console.log(err);
+  } else {
+    files.forEach(file => {
+      if (path.extname(file.name) === '.css') {
+        let fileSrc = path.join(pathSrc, file.name);
+        console.log(file.name + '\t' + 'append to bundle.css');
+        fs.readFile(fileSrc, "utf8", (err, data) => {
+          if(err) {s
+            console.log(err); 
+          } else {
+            fs.appendFile(fileBundCss, data, (err) => {
+              if(err) console.log(err); 
+            });    
+          }  
+        });
+      }  
+    });    
+  }
+})
 
 function makeDir (pathDir) {
   fs.exists(pathDir, (exists) => {
@@ -113,4 +101,16 @@ function copyFilesFromDir (pathSrc, pathDst) {
       });    
     }
   })
+}
+
+function addArray (data, spaceNum) {
+  let array = data.toString().split("\n").map(item => item = " ".repeat(spaceNum) + item); 
+  return array;
+}
+
+function writeToFile (inputArr) {
+  let content = inputArr.join("\n");
+  fs.writeFile(fileBundHtml, content, (err) => {
+    if(err) console.log(err); 
+  });    
 }
